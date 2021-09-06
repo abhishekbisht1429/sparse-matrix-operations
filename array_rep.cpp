@@ -9,6 +9,8 @@ struct node {
     int r, c;
     double val;
 
+    public:node() {}
+    public:node(int r, int c, double val): r(r), c(c), val(val) {}
     int comp(const node &nd) {
         if(this->r < nd.r) {
             return -1;
@@ -121,6 +123,23 @@ class sparse_matrix_2d {
         return sum;
     }
 
+    public:sparse_matrix_2d transpose() {
+        sparse_matrix_2d t(len, r, c);
+        int *col_count = new int[c]();
+        for(int i=0; i<len; ++i)
+            col_count[arr[i].c]++;
+        
+        int *index = new int[c]();
+        index[0] = 0;
+        for(int i=1; i<c; ++i)
+            index[i] = index[i-1] + col_count[i-1];
+        
+        for(int i=0; i<len; ++i)
+            t.arr[index[arr[i].c]++] = node(arr[i].c, arr[i].r, arr[i].val);
+        
+        return t;
+    }
+
     public:void display() {
         for(int i=0; i<len; ++i)
             cout<<arr[i].r<<" "<<arr[i].c<<" "<<arr[i].val<<"\n";
@@ -163,6 +182,10 @@ int main() {
 
     sparse_matrix_2d sum = mat1 + mat2;
     sum.display();
+
+    cout<<"transponse\n";
+    sparse_matrix_2d t = mat1.transpose();
+    t.display();
 
     /* #######################CODE_END############################### */
     #ifdef DEBUG
