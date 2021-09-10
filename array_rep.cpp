@@ -123,7 +123,7 @@ class sparse_matrix_2d {
         return sum;
     }
 
-    public:sparse_matrix_2d transpose() {
+    public:sparse_matrix_2d transpose() const {
         sparse_matrix_2d t(len, r, c);
         int *col_count = new int[c]();
         for(int i=0; i<len; ++i)
@@ -138,6 +138,46 @@ class sparse_matrix_2d {
             t.arr[index[arr[i].c]++] = node(arr[i].c, arr[i].r, arr[i].val);
         
         return t;
+    }
+
+    public:sparse_matrix_2d operator*(const sparse_matrix_2d &mat) {
+        if(this->c != mat.r)
+            return sparse_matrix_2d(0, 0, 0);
+        
+        sparse_matrix_2d matT = mat.transpose();
+        sparse_matrix_2d res(r*mat.c, r, mat.c);
+        int k = 0;
+        int i1 = 0;
+        while(i1 < len) {
+            int res_r = arr[i1].r;
+            int i2 = 0;
+            while(i2 < matT.len) {
+                int res_c = matT.arr[i2].r;
+                int ti1 = i1, ti2 = i2;
+                int sum = 0;
+                while(ti1 < len && arr[ti1].r == res_r && ti2 < matT.len && matT.arr[ti2].r == res_c) {
+                    if(arr[ti1].c == matT.arr[ti2].c)
+                        sum += arr[ti1++].val * matT.arr[ti2++].val;
+                    else if(arr[ti1].c < matT.arr[ti2].c)
+                        ++ti1;
+                    else
+                        ++ti2;
+                }
+                if(sum != 0) {
+                    res.arr[k].r = res_r;
+                    res.arr[k].c = res_c;
+                    res.arr[k++].val = sum;
+                }
+                
+                while(i2 < matT.len && matT.arr[i2].r == res_c)
+                    ++i2;
+            }
+            while(i1 < len && arr[i1].r == res_r)
+                ++i1;
+        }
+        res.len = k;
+
+        return res;
     }
 
     public:void display() {
@@ -184,8 +224,12 @@ int main() {
     sum.display();
 
     cout<<"transponse\n";
-    sparse_matrix_2d t = mat1.transpose();
+    sparse_matrix_2d t = mat2.transpose();
     t.display();
+
+    cout<<"product\n";
+    sparse_matrix_2d p = mat1 * mat2;
+    p.display();
 
     /* #######################CODE_END############################### */
     #ifdef DEBUG
