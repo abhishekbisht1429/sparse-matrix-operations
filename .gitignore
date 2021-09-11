@@ -2,3 +2,4 @@
 **/*.out
 **/input.txt
 **/output.txt
+**/test/**
