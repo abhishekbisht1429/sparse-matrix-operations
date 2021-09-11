@@ -54,8 +54,8 @@ class list {
     public:void push_back(node<T> *nd) {
         if(nd == nullptr)
             return;
-        _size++;
         if(empty()) {
+            _size++;
             _back = nd;
             _front = nd;
             return;
@@ -67,8 +67,8 @@ class list {
     public:void push_front(node<T> *nd) {
         if(nd == nullptr)
             return;
-        _size++;
         if(empty()) {
+            _size++;
             _back = nd;
             _front = nd;
             return;
@@ -153,10 +153,18 @@ class sparse_matrix_2d {
     int r, c;
 
     public:sparse_matrix_2d(int r, int c) {
+        if(r<0 || c<0) {
+            cout<<"Invalid dimensions\n";
+            return;
+        }
         this->r = r;
         this->c = c;
     }
     public:sparse_matrix_2d(T **mat, int r, int c) {
+        if(r<0 || c<0 || mat==nullptr) {
+            cout<<"Invalid dimensions\n";
+            return;
+        }
         this->r = r;
         this->c = c;
         for(int i=0; i<r; ++i)
@@ -190,6 +198,10 @@ class sparse_matrix_2d {
     }
 
     public:sparse_matrix_2d<T> operator+(const sparse_matrix_2d<T> &mat) {
+        if(this->r != mat.r && this->c != mat.c) {
+            cout<<"Invalid matrix dimensions\n";
+            return sparse_matrix_2d(-1, -1);
+        }
         node<T> *temp1 = li.front();
         node<T> *temp2 = mat.li.front();
         sparse_matrix_2d sum(this->r, this->c);
@@ -216,14 +228,42 @@ class sparse_matrix_2d {
     }
 
     public:sparse_matrix_2d<T> transpose() const {
-        /*
-             TODO: complete transpose function
-        */
-        return *this;
+        int size = this->li.size();
+        /* create new matrix to store transpose */
+        sparse_matrix_2d<T> trans(this->r, this->c);
+        for(int i=0; i<size; ++i)
+            trans.li.push_back(new node<T>(-1, -1, -1));
+        
+        node<T> **ptr_arr = new node<T>*[size];
+        int *count = new int[size];
+        int *index = new int[size];
+        node<T> *temp1 = this->li.front();
+        node<T> *temp2 = trans.li.front();
+        for(int i=0; i<size; ++i) {
+            ptr_arr[i] = temp2;
+            ++count[temp1->j];
+            temp1 = temp1->next;
+            temp2 = temp2->next;
+        }
+        index[0] = 0;
+        for(int i=1; i<size; ++i)
+            index[i] = index[i-1] + count[i-1];
+        
+        node<T> *temp = this->li.front();
+        while(temp!=nullptr) {
+            node<T> *ptr = ptr_arr[index[temp->j]++];
+            ptr->i = temp->j;
+            ptr->j = temp->i;
+            ptr->val = temp->val;
+            temp = temp->next;
+        }
+        
+        return trans;
     }
 
     public:sparse_matrix_2d<T> operator*(const sparse_matrix_2d<T> &mat) {
         if(this->c != mat.r) {
+            cout<<this->c<<" "<<mat.r<<"\n";
             cout<<"invalid matrix dimensions\n";
             return sparse_matrix_2d<T>(0, 0);
         }
@@ -285,21 +325,25 @@ int main() {
     auto _start = chrono::high_resolution_clock::now();
     #endif
     /* ######################CODE_START################################ */
-    int n, m;
-    cin>>n>>m;
-    int **arr = new int*[n];
-    for(int i=0; i<n; ++i)
-        arr[i] = new int[m];
+    int n1, m1;
+    cin>>n1>>m1;
+    int **arr1 = new int*[n1];
+    for(int i=0; i<n1; ++i)
+        arr1[i] = new int[m1];
+    for(int i=0; i<n1; ++i)
+        for(int j=0; j<m1; ++j)
+            cin>>arr1[i][j];
+    sparse_matrix_2d<int> mat1(arr1, n1, m1);
 
-    for(int i=0; i<n; ++i)
-        for(int j=0; j<m; ++j)
-            cin>>arr[i][j];
-    sparse_matrix_2d<int> mat1(arr, n, m);
-
-    for(int i=0; i<n; ++i)
-        for(int j=0; j<m; ++j)
-            cin>>arr[i][j];
-    sparse_matrix_2d<int> mat2(arr, n, m);
+    int n2, m2;
+    cin>>n2>>m2;
+    int **arr2 = new int*[n2];
+    for(int i=0; i<n2; ++i)
+        arr2[i] = new int[m2];
+    for(int i=0; i<n2; ++i)
+        for(int j=0; j<m2; ++j)
+            cin>>arr2[i][j];
+    sparse_matrix_2d<int> mat2(arr2, n2, m2);
 
     cout<<"sparse matrix 1\n";
     mat1.display();
@@ -310,9 +354,9 @@ int main() {
     sparse_matrix_2d<int> sum = mat1 + mat2;
     sum.display();
 
-    // cout<<"transponse\n";
-    // sparse_matrix_2d<int> t = mat2.transpose();
-    // t.display();
+    cout<<"transponse\n";
+    sparse_matrix_2d<int> t = mat2.transpose();
+    t.display();
 
     cout<<"product\n";
     sparse_matrix_2d<int> p = mat1 * mat2;
