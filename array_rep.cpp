@@ -101,9 +101,9 @@ class sparse_matrix_2d {
     }
 
     public:sparse_matrix_2d operator+(const sparse_matrix_2d &mat) {
-        if(this->r != mat.r && this->c != mat.c) {
+        if(this->r != mat.r || this->c != mat.c) {
             cout<<"Invalid dimensions for addition\n";
-            return sparse_matrix_2d(0, -1, -1);
+            return sparse_matrix_2d(0, 0, 0);
         }
 
         int i=0, j=0;
@@ -128,7 +128,7 @@ class sparse_matrix_2d {
                 sum.arr[k].val = mat.arr[j].val;
                 j++;
             }
-            k++;
+            if(sum.arr[k].val!=0) k++;
         }
         while(i < this->len) {
             sum.arr[k].r = arr[i].r;
@@ -164,12 +164,9 @@ class sparse_matrix_2d {
 
     public:sparse_matrix_2d operator*(const sparse_matrix_2d &mat) {
         if(this->c != mat.r) {
-            cout<<this->c<<" "<<mat.r<<"\n";
             cout<<"invalid matrix dimensions\n";
-            return sparse_matrix_2d<T>(0, 0);
+            return sparse_matrix_2d<T>(0, 0, 0);
         }
-        if(this->c != mat.r)
-            return sparse_matrix_2d(0, 0, 0);
         
         sparse_matrix_2d matT = mat.transpose();
         sparse_matrix_2d res(r*mat.c, r, mat.c);
@@ -228,21 +225,25 @@ int main() {
     auto _start = chrono::high_resolution_clock::now();
     #endif
     /* ######################CODE_START################################ */
-    int n, m;
-    cin>>n>>m;
-    int **arr = new int*[n];
-    for(int i=0; i<n; ++i)
-        arr[i] = new int[m];
+    int n1, m1;
+    cin>>n1>>m1;
+    int **arr1 = new int*[n1];
+    for(int i=0; i<n1; ++i)
+        arr1[i] = new int[m1];
+    for(int i=0; i<n1; ++i)
+        for(int j=0; j<m1; ++j)
+            cin>>arr1[i][j];
+    sparse_matrix_2d<int> mat1(arr1, n1, m1);
 
-    for(int i=0; i<n; ++i)
-        for(int j=0; j<m; ++j)
-            cin>>arr[i][j];
-    sparse_matrix_2d<int> mat1(arr, n, m);
-
-    for(int i=0; i<n; ++i)
-        for(int j=0; j<m; ++j)
-            cin>>arr[i][j];
-    sparse_matrix_2d<int> mat2(arr, n, m);
+    int n2, m2;
+    cin>>n2>>m2;
+    int **arr2 = new int*[n2];
+    for(int i=0; i<n2; ++i)
+        arr2[i] = new int[m2];
+    for(int i=0; i<n2; ++i)
+        for(int j=0; j<m2; ++j)
+            cin>>arr2[i][j];
+    sparse_matrix_2d<int> mat2(arr2, n2, m2);
 
     cout<<"sparse matrix 1\n";
     mat1.display();
