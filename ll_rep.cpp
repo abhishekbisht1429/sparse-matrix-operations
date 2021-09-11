@@ -198,9 +198,9 @@ class sparse_matrix_2d {
     }
 
     public:sparse_matrix_2d<T> operator+(const sparse_matrix_2d<T> &mat) {
-        if(this->r != mat.r && this->c != mat.c) {
+        if(this->r != mat.r || this->c != mat.c) {
             cout<<"Invalid matrix dimensions\n";
-            return sparse_matrix_2d(-1, -1);
+            return sparse_matrix_2d(0, 0);
         }
         node<T> *temp1 = li.front();
         node<T> *temp2 = mat.li.front();
@@ -217,6 +217,8 @@ class sparse_matrix_2d {
                 sum.li.push_back(new node<T>(temp2->i, temp2->j, temp2->val));
                 temp2 = temp2->next;
             }
+            if(sum.li.back()->val == 0)
+                delete sum.li.pop_back();
         }
         for(;temp1 != nullptr; temp1 = temp1->next)
             sum.li.push_back(new node<T>(temp1->i, temp1->j, temp1->val));
@@ -229,7 +231,6 @@ class sparse_matrix_2d {
 
     public:sparse_matrix_2d<T> transpose() const {
         int size = this->li.size();
-
         /* create new matrix to store transpose */
         sparse_matrix_2d<T> trans(this->r, this->c);
         for(int i=0; i<size; ++i)
@@ -238,9 +239,9 @@ class sparse_matrix_2d {
         /* array to store the address of nodes */
         node<T> **ptr_arr = new node<T>*[size];
         /* array to store the count of column elements */
-        int *count = new int[size];
+        int *count = new int[this->c]();
         /* array to store correct position of elements in transpose */
-        int *index = new int[size];
+        int *index = new int[this->c]();
 
         /* fill the arrays */
         node<T> *temp1 = this->li.front();
@@ -254,9 +255,9 @@ class sparse_matrix_2d {
 
         /* calculate correct position for each node */
         index[0] = 0;
-        for(int i=1; i<size; ++i)
+        for(int i=1; i<this->c; ++i)
             index[i] = index[i-1] + count[i-1];
-        
+
         /* tranpose the original matrix */
         node<T> *temp = this->li.front();
         while(temp!=nullptr) {
@@ -267,6 +268,8 @@ class sparse_matrix_2d {
             temp = temp->next;
         }
 
+        for(int i=0; i<size; ++i)
+            ptr_arr[i] = nullptr;
         delete[] ptr_arr;
         delete[] count;
         delete[] index;
@@ -276,7 +279,6 @@ class sparse_matrix_2d {
 
     public:sparse_matrix_2d<T> operator*(const sparse_matrix_2d<T> &mat) {
         if(this->c != mat.r) {
-            cout<<this->c<<" "<<mat.r<<"\n";
             cout<<"invalid matrix dimensions\n";
             return sparse_matrix_2d<T>(0, 0);
         }
