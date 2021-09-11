@@ -229,14 +229,20 @@ class sparse_matrix_2d {
 
     public:sparse_matrix_2d<T> transpose() const {
         int size = this->li.size();
+
         /* create new matrix to store transpose */
         sparse_matrix_2d<T> trans(this->r, this->c);
         for(int i=0; i<size; ++i)
             trans.li.push_back(new node<T>(-1, -1, -1));
         
+        /* array to store the address of nodes */
         node<T> **ptr_arr = new node<T>*[size];
+        /* array to store the count of column elements */
         int *count = new int[size];
+        /* array to store correct position of elements in transpose */
         int *index = new int[size];
+
+        /* fill the arrays */
         node<T> *temp1 = this->li.front();
         node<T> *temp2 = trans.li.front();
         for(int i=0; i<size; ++i) {
@@ -245,10 +251,13 @@ class sparse_matrix_2d {
             temp1 = temp1->next;
             temp2 = temp2->next;
         }
+
+        /* calculate correct position for each node */
         index[0] = 0;
         for(int i=1; i<size; ++i)
             index[i] = index[i-1] + count[i-1];
         
+        /* tranpose the original matrix */
         node<T> *temp = this->li.front();
         while(temp!=nullptr) {
             node<T> *ptr = ptr_arr[index[temp->j]++];
@@ -257,6 +266,10 @@ class sparse_matrix_2d {
             ptr->val = temp->val;
             temp = temp->next;
         }
+
+        delete[] ptr_arr;
+        delete[] count;
+        delete[] index;
         
         return trans;
     }
