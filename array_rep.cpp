@@ -5,13 +5,14 @@
 #define DEBUG
 using namespace std;
 
+template<class T>
 struct node {
     int r, c;
-    double val;
+    T val;
 
     public:node() {}
-    public:node(int r, int c, double val): r(r), c(c), val(val) {}
-    int comp(const node &nd) {
+    public:node(int r, int c, T val): r(r), c(c), val(val) {}
+    int comp(const node<T> &nd) {
         if(this->r < nd.r) {
             return -1;
         } else if(this->r == nd.r) {
@@ -26,31 +27,32 @@ struct node {
         }
     }
 
-    bool operator<(const node &nd) {
+    bool operator<(const node<T> &nd) {
         return comp(nd) < 0;
     }
 
-    bool operator>(const node &nd) {
+    bool operator>(const node<T> &nd) {
         return comp(nd) > 0;
     }
 
-    bool operator==(const node &nd) {
+    bool operator==(const node<T> &nd) {
         return comp(nd) == 0;
     }
 };
 
+template<class T>
 class sparse_matrix_2d {
-    node *arr;
+    node<T> *arr;
     int len;
     int r, c;
 
     public:sparse_matrix_2d(int n, int r, int c) {
         len = n;
-        arr = new node[n];
+        arr = new node<T>[n];
         this->r = r;
         this->c = c;
     }
-    public:sparse_matrix_2d(double **mat, int r, int c) {
+    public:sparse_matrix_2d(T **mat, int r, int c) {
         this->r = r;
         this->c = c;
         this->len = 0;
@@ -58,7 +60,7 @@ class sparse_matrix_2d {
             for(int j=0; j<c; ++j)
                 if(mat[i][j] != 0) len++;
         
-        arr = new node[len];
+        arr = new node<T>[len];
 
         int k = 0;
         for(int i=0; i<r; ++i) {
@@ -81,7 +83,7 @@ class sparse_matrix_2d {
         this->len = mat.len;
         this->r = mat.r;
         this->c = mat.c;
-        this->arr = new node[this->len];
+        this->arr = new node<T>[this->len];
         for(int i=0; i<len; ++i)
             arr[i] = mat.arr[i];
     }
@@ -135,7 +137,7 @@ class sparse_matrix_2d {
             index[i] = index[i-1] + col_count[i-1];
         
         for(int i=0; i<len; ++i)
-            t.arr[index[arr[i].c]++] = node(arr[i].c, arr[i].r, arr[i].val);
+            t.arr[index[arr[i].c]++] = node<T>(arr[i].c, arr[i].r, arr[i].val);
         
         return t;
     }
@@ -203,32 +205,35 @@ int main() {
     /* ######################CODE_START################################ */
     int n, m;
     cin>>n>>m;
-    double **arr = new double*[n];
+    int **arr = new int*[n];
     for(int i=0; i<n; ++i)
-        arr[i] = new double[m];
+        arr[i] = new int[m];
 
     for(int i=0; i<n; ++i)
         for(int j=0; j<m; ++j)
             cin>>arr[i][j];
-    sparse_matrix_2d mat1(arr, n, m);
+    sparse_matrix_2d<int> mat1(arr, n, m);
 
     for(int i=0; i<n; ++i)
         for(int j=0; j<m; ++j)
             cin>>arr[i][j];
-    sparse_matrix_2d mat2(arr, n, m);
+    sparse_matrix_2d<int> mat2(arr, n, m);
 
+    cout<<"sparse matrix 1\n";
     mat1.display();
+    cout<<"sparse matrix 2\n";
     mat2.display();
 
-    sparse_matrix_2d sum = mat1 + mat2;
+    cout<<"sum\n";
+    sparse_matrix_2d<int> sum = mat1 + mat2;
     sum.display();
 
     cout<<"transponse\n";
-    sparse_matrix_2d t = mat2.transpose();
+    sparse_matrix_2d<int> t = mat2.transpose();
     t.display();
 
     cout<<"product\n";
-    sparse_matrix_2d p = mat1 * mat2;
+    sparse_matrix_2d<int> p = mat1 * mat2;
     p.display();
 
     /* #######################CODE_END############################### */
