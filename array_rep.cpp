@@ -47,12 +47,20 @@ class sparse_matrix_2d {
     int r, c;
 
     public:sparse_matrix_2d(int n, int r, int c) {
+        if(r<0 || c<0) {
+            cout<<"Invalid dimensions\n";
+            return;
+        }
         len = n;
         arr = new node<T>[n];
         this->r = r;
         this->c = c;
     }
     public:sparse_matrix_2d(T **mat, int r, int c) {
+        if(r<0 || c<0 || mat==nullptr) {
+            cout<<"Invalid dimensions\n";
+            return;
+        }   
         this->r = r;
         this->c = c;
         this->len = 0;
@@ -93,8 +101,10 @@ class sparse_matrix_2d {
     }
 
     public:sparse_matrix_2d operator+(const sparse_matrix_2d &mat) {
-        if(this->r != mat.r && this->c != mat.c)
-            return sparse_matrix_2d(0, 0, 0);
+        if(this->r != mat.r && this->c != mat.c) {
+            cout<<"Invalid dimensions for addition\n";
+            return sparse_matrix_2d(0, -1, -1);
+        }
 
         int i=0, j=0;
         int max_len = this->len + mat.len;
@@ -153,6 +163,11 @@ class sparse_matrix_2d {
     }
 
     public:sparse_matrix_2d operator*(const sparse_matrix_2d &mat) {
+        if(this->c != mat.r) {
+            cout<<this->c<<" "<<mat.r<<"\n";
+            cout<<"invalid matrix dimensions\n";
+            return sparse_matrix_2d<T>(0, 0);
+        }
         if(this->c != mat.r)
             return sparse_matrix_2d(0, 0, 0);
         
