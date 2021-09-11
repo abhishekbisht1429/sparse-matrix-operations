@@ -150,29 +150,22 @@ class list {
 template<typename T>
 class sparse_matrix_2d {
     list<T> li;
-    int _size;
     int r, c;
 
     public:sparse_matrix_2d(int r, int c) {
-        _size = 0;
         this->r = r;
         this->c = c;
     }
     public:sparse_matrix_2d(T **mat, int r, int c) {
         this->r = r;
         this->c = c;
-        this->_size = 0;
-        for(int i=0; i<r; ++i) {
-            for(int j=0; j<c; ++j) {
-                if(mat[i][j] != 0) {
+        for(int i=0; i<r; ++i)
+            for(int j=0; j<c; ++j) 
+                if(mat[i][j] != 0)
                     li.push_back(new node<T>(i, j, mat[i][j]));
-                    this->_size++;
-                }
-            }
-        }
     }
 
-    public:sparse_matrix_2d(const sparse_matrix_2d &mat) {
+    public:sparse_matrix_2d(const sparse_matrix_2d<T> &mat) {
         *this = mat;
     }
 
@@ -182,20 +175,21 @@ class sparse_matrix_2d {
         }
     }
 
-    public:void operator=(const sparse_matrix_2d &mat) {
-        this->_size = mat.size();
+    public:void operator=(const sparse_matrix_2d<T> &mat) {
         this->r = mat.r;
         this->c = mat.c;
         node<T> *temp = mat.li.front();
-        while(temp!=nullptr)
+        while(temp!=nullptr) {
             li.push_back(new node<T>(temp->i, temp->j, temp->val));
+            temp = temp->next;
+        }
     }
 
     public:int size() const {
-        return _size;
+        return li.size();
     }
 
-    public:sparse_matrix_2d operator+(const sparse_matrix_2d &mat) {
+    public:sparse_matrix_2d<T> operator+(const sparse_matrix_2d<T> &mat) {
         node<T> *temp1 = li.front();
         node<T> *temp2 = mat.li.front();
         sparse_matrix_2d sum(this->r, this->c);
@@ -219,6 +213,53 @@ class sparse_matrix_2d {
             sum.li.push_back(new node<T>(temp2->i, temp2->j, temp2->val));
 
         return sum;
+    }
+
+    public:sparse_matrix_2d<T> transpose() const {
+        /*
+             TODO: complete transpose function
+        */
+        return *this;
+    }
+
+    public:sparse_matrix_2d<T> operator*(const sparse_matrix_2d<T> &mat) {
+        if(this->c != mat.r) {
+            cout<<"invalid matrix dimensions\n";
+            return sparse_matrix_2d<T>(0, 0);
+        }
+        sparse_matrix_2d<T> trans = mat.transpose();
+        sparse_matrix_2d<T> res(this->r, mat.c);
+
+        
+        node<T> *p1 = this->li.front();
+        while(p1 != nullptr) {
+            int i = p1->i;
+            node<T> *p2 = trans.li.front();
+            while(p2 != nullptr) {
+                int j = p2->i;
+                node<T> *tp1 = p1, *tp2 = p2;
+                int sum = 0;
+                while(tp1!=nullptr && tp1->i == i && tp2!=nullptr && tp2->i == j) {
+                    if(tp1->j == tp2->j) {
+                        sum += tp1->val * tp2->val;
+                        tp1 = tp1->next;
+                        tp2 = tp2->next;
+                    } else if(tp1->j < tp2->j) {
+                        tp1 = tp1->next;
+                    } else {
+                        tp2 = tp2->next;
+                    }
+                }
+                if(sum != 0)
+                    res.li.push_back(new node<T>(i, j, sum));
+                while(p2 != nullptr && p2->i == j)
+                    p2 = p2->next;
+            }
+            while(p1 != nullptr && p1->i == i)
+                p1 = p1->next;
+        }
+
+        return res;
     }
 
     public:void display() {
@@ -273,9 +314,9 @@ int main() {
     // sparse_matrix_2d<int> t = mat2.transpose();
     // t.display();
 
-    // cout<<"product\n";
-    // sparse_matrix_2d<int> p = mat1 * mat2;
-    // p.display();
+    cout<<"product\n";
+    sparse_matrix_2d<int> p = mat1 * mat2;
+    p.display();
 
     /* #######################CODE_END############################### */
     #ifdef DEBUG
