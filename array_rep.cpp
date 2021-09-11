@@ -120,6 +120,16 @@ class sparse_matrix_2d {
             }
             k++;
         }
+        while(i < this->len) {
+            sum.arr[k].r = arr[i].r;
+            sum.arr[k].c = arr[i].c;
+            sum.arr[k++].val = arr[i++].val;
+        }
+        while(j < mat.len) {
+                sum.arr[k].r = mat.arr[j].r;
+                sum.arr[k].c = mat.arr[j].c;
+                sum.arr[k++].val = mat.arr[j++].val;        
+        }
         sum.len = k;
 
         return sum;
