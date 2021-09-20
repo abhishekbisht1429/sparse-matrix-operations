@@ -178,7 +178,7 @@ class sparse_matrix_2d {
             while(i2 < matT.len) {
                 int res_c = matT.arr[i2].r;
                 int ti1 = i1, ti2 = i2;
-                int sum = 0;
+                T sum = 0;
                 while(ti1 < len && arr[ti1].r == res_r && ti2 < matT.len && matT.arr[ti2].r == res_c) {
                     if(arr[ti1].c == matT.arr[ti2].c)
                         sum += arr[ti1++].val * matT.arr[ti2++].val;

@@ -293,7 +293,7 @@ class sparse_matrix_2d {
             while(p2 != nullptr) {
                 int j = p2->i;
                 node<T> *tp1 = p1, *tp2 = p2;
-                int sum = 0;
+                T sum = 0;
                 while(tp1!=nullptr && tp1->i == i && tp2!=nullptr && tp2->i == j) {
                     if(tp1->j == tp2->j) {
                         sum += tp1->val * tp2->val;
